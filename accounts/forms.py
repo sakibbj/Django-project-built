@@ -1,0 +1,37 @@
+from django import forms
+from .models import Account
+
+class RegistrationForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'placeholder': 'Enter Password',
+        'class': 'form-control',
+    }))
+    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={
+        'placeholder': 'Confirm Password',
+    }))
+
+
+    class Meta:
+        model = Account
+        fields = ['firstName', 'lastName', 'phone', 'email', 'password']
+
+    
+    def clean(self):
+        cleaned_data = super(RegistrationForm, self).clean()
+        password = cleaned_data.get('password')
+        confirm_password = cleaned_data.get('confirm_password')
+
+        if password != confirm_password:
+            raise forms.ValidationError(
+                "Password dose not match!"
+            )
+
+
+    def __init__(self, *args, **kwargs):
+        super(RegistrationForm, self).__init__(*args, **kwargs)
+        self.fields['firstName'].widget.attrs['placeholder'] = 'Enter First Name'
+        self.fields['lastName'].widget.attrs['placeholder'] = 'Enter Last Name'
+        self.fields['phone'].widget.attrs['placeholder'] = 'Enter Phone Name'
+        self.fields['email'].widget.attrs['placeholder'] = 'Enter E-mail Address'
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control'
